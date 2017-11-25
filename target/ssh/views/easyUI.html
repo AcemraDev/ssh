@@ -7,25 +7,164 @@
     <link rel="stylesheet" type="text/css" href="../css/icon.css"/>
     <script type="text/javascript" src="../js/jquery.min.js"></script>
     <script type="text/javascript" src="../js/jquery.easyui.min.js"></script>
+    <script type="text/javascript">
+        var url = '';
+        function newRole(){
+            $('#dlg').dialog('open').dialog('setTitle','创建角色');
+            $('#fm').form('clear');
+            url = 'save_role';
+        }
+        function editRole() {
+            var row = $('#dg').datagrid('getSelected');
+            if (row){
+                $('#dlg').dialog('open').dialog('setTitle','编辑角色');
+                $('#fm').form('load',row);
+                url = 'update_role/'+row.id;
+            }
+        }
+        function saveRole(){
+            $('#fm').form('submit',{
+                url: url,
+                onSubmit: function(){
+                    return $(this).form('validate');
+                },
+                success: function(result){
+                    var result = eval('('+result+')');
+                    if (result.errorMsg){
+                        $.messager.show({
+                            title: 'Error',
+                            msg: result.errorMsg
+                        });
+                    } else {
+                        $('#dlg').dialog('close');		// close the dialog
+                        $('#dg').datagrid('reload');	// reload the user data
+                    }
+                }
+            });
+        }
+        function destroyRole(){
+            var row = $('#dg').datagrid('getSelected');
+            if (row){
+                $.messager.confirm('Confirm','你确定要删除这个角色吗?',function(r){
+                    if (r){
+                        $.post('destroy_user.php',{id:row.id},function(result){
+                            if (result.success){
+                                $('#dg').datagrid('reload');	// reload the user data
+                            } else {
+                                $.messager.show({	// show error message
+                                    title: 'Error',
+                                    msg: result.errorMsg
+                                });
+                            }
+                        },'json');
+                    }
+                });
+            }
+        }
+    </script>
 </head>
 <body>
-    <table id="dg" title="My Users" class="easyui-datagrid" style="width:550px;height:250px"
-           url="/getUsers"
+    <!--数据展示区域-->
+    <table id="dg" title="角色信息" class="easyui-datagrid" style="width:100%;height:250px"
+           url="/getRoles"
            toolbar="#toolbar"
            rownumbers="true" fitColumns="true" singleSelect="true">
         <thead>
         <tr>
-            <th field="firstname" width="50">First Name</th>
-            <th field="lastname" width="50">Last Name</th>
-            <th field="phone" width="50">Phone</th>
-            <th field="email" width="50">Email</th>
+            <th field="role_id" width="300">角色ID</th>
+            <th field="account" width="300">账号</th>
+            <th field="area" width="300">区组</th>
+            <th field="name" width="300">名称</th>
+            <th field="stupa" width="300">塔</th>
+            <th field="coin" width="300">币</th>
+            <th field="fs_time" width="300">开始时间一</th>
+            <th field="f_status" width="300">状态</th>
+            <th field="fe_time" width="300">结束时间一</th>
+            <th field="ss_time" width="300">开始时间二</th>
+            <th field="s_status" width="300">状态</th>
+            <th field="se_time" width="300">结束时间二</th>
+            <th field="ts_time" width="300">开始时间三</th>
+            <th field="t_status" width="300">状态</th>
+            <th field="te_time" width="300">结束时间三</th>
         </tr>
         </thead>
     </table>
     <div id="toolbar">
-        <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newUser()">New User</a>
-        <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editUser()">Edit User</a>
-        <a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyUser()">Remove User</a>
+        <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newRole()">创建角色</a>
+        <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editRole()">编辑角色</a>
+        <a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyRole()">删除角色</a>
+    </div>
+
+    <!--创建或者编辑-->
+    <div id="dlg" class="easyui-dialog" style="width:400px;height:280px;padding:10px 20px"
+         closed="true" buttons="#dlg-buttons">
+        <div class="ftitle">角色信息</div>
+        <form id="fm" method="post">
+            <div class="account">
+                <label>账号:</label>
+                <input id="qysjzt" name="qysjzt" class="easyui-combobox" width="50px">
+            </div>
+            <div class="area">
+                <label>区组:</label>
+                <input name="lastname" class="easyui-validatebox" required="true">
+            </div>
+            <div class="name">
+                <label>名称:</label>
+                <input name="phone">
+            </div>
+            <div class="stupa">
+                <label>塔:</label>
+                <input name="email" class="easyui-validatebox" validType="email">
+            </div>
+
+            <div class="coin">
+                <label>币:</label>
+                <input name="email" class="easyui-validatebox" validType="email">
+            </div>
+
+            <div class="fs_time">
+                <label>开始时间一:</label>
+                <input class="easyui-datetimebox" name="birthday"
+                       data-options="required:true,showSeconds:false" value="3/4/2010 2:3" style="width:150px">
+            </div>
+
+            <div class="f_status">
+                <label>状态一:</label>
+                <input name="email" class="easyui-validatebox" validType="email">
+            </div>
+            <div class="fe_time">
+                <label>状态一:</label>
+                <input name="email" class="easyui-validatebox" validType="email">
+            </div>
+            <div class="ss_time">
+                <label>状态一:</label>
+                <input name="email" class="easyui-validatebox" validType="email">
+            </div>
+            <div class="s_status">
+                <label>状态一:</label>
+                <input name="email" class="easyui-validatebox" validType="email">
+            </div>
+            <div class="se_time">
+                <label>状态一:</label>
+                <input name="email" class="easyui-validatebox" validType="email">
+            </div>
+            <div class="ts_time">
+                <label>状态一:</label>
+                <input name="email" class="easyui-validatebox" validType="email">
+            </div>
+            <div class="t_status">
+                <label>状态一:</label>
+                <input name="email" class="easyui-validatebox" validType="email">
+            </div>
+            <div class="te_time">
+                <label>状态一:</label>
+                <input name="email" class="easyui-validatebox" validType="email">
+            </div>
+        </form>
+    </div>
+    <div id="dlg-buttons">
+        <a href="#" class="easyui-linkbutton" iconCls="icon-ok" onclick="saveRole()">Save</a>
+        <a href="#" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg').dialog('close')">Cancel</a>
     </div>
 </body>
 </html>

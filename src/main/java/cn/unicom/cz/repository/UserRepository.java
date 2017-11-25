@@ -1,5 +1,6 @@
 package cn.unicom.cz.repository;
 
+import cn.unicom.cz.entity.Role;
 import cn.unicom.cz.entity.User;
 
 /**
